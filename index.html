@@ -65,7 +65,6 @@
         </div>
       </div>
 
-      <!-- Search Bar -->
       <div class="bg-white rounded-2xl shadow-2xl p-6 mb-8 fade-in">
         <div class="flex gap-3 mb-4">
           <div class="flex-1 relative">
@@ -98,7 +97,6 @@
           </button>
         </div>
 
-        <!-- Quick Search Examples -->
         <div class="border-t pt-4">
           <p class="text-sm text-gray-500 mb-2">Contoh pencarian:</p>
           <div class="flex gap-2 flex-wrap">
@@ -130,13 +128,11 @@
         </div>
       </div>
 
-      <!-- Loading State -->
       <div id="loadingState" class="hidden text-center py-12">
         <div class="loader mx-auto mb-4"></div>
         <p class="text-gray-600">Mencari dengan AI semantic search...</p>
       </div>
 
-      <!-- Search Results -->
       <div id="searchResults" class="hidden">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold text-gray-800">
@@ -167,12 +163,9 @@
         <div
           id="appsGrid"
           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          <!-- Apps will be loaded here -->
-        </div>
+        ></div>
       </div>
 
-      <!-- Empty State -->
       <div
         id="emptyState"
         class="hidden text-center py-12 bg-white rounded-xl shadow-lg"
@@ -215,11 +208,9 @@
         "Document Management": "📁",
       };
 
-      // Load all apps on page load
       window.onload = () => {
         loadAllApps();
 
-        // Enable search on Enter key
         document
           .getElementById("searchInput")
           .addEventListener("keypress", (e) => {
@@ -254,14 +245,12 @@
         const query = document.getElementById("searchInput").value.trim();
 
         if (!query) {
-          // Show all apps if query is empty
           document.getElementById("allApps").classList.remove("hidden");
           document.getElementById("searchResults").classList.add("hidden");
           document.getElementById("emptyState").classList.add("hidden");
           return;
         }
 
-        // Show loading
         document.getElementById("loadingState").classList.remove("hidden");
         document.getElementById("allApps").classList.add("hidden");
         document.getElementById("searchResults").classList.add("hidden");
@@ -278,11 +267,9 @@
 
           const data = await response.json();
 
-          // Hide loading
           document.getElementById("loadingState").classList.add("hidden");
 
           if (data.results && data.results.length > 0) {
-            // Show results
             document.getElementById("searchResults").classList.remove("hidden");
             document.getElementById(
               "resultsTitle"
@@ -296,7 +283,6 @@
               .map((result, idx) => createSearchResultCard(result, idx + 1))
               .join("");
           } else {
-            // Show empty state
             document.getElementById("emptyState").classList.remove("hidden");
             document.getElementById("emptyQuery").textContent = query;
           }
