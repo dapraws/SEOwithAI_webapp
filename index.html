@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEO App Search Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-in {
+        animation: fadeIn 0.5s ease-out;
+      }
+      .loader {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #3b82f6;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in">
+        <h1 class="text-5xl font-bold text-gray-800 mb-3">
+          🔍 SEO App Search Engine
+        </h1>
+        <p class="text-gray-600 text-lg mb-2">
+          AI-powered semantic search dengan sentence-transformers
+        </p>
+        <div
+          class="inline-flex items-center gap-2 bg-blue-100 px-4 py-2 rounded-full"
+        >
+          <svg
+            class="w-5 h-5 text-blue-600"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z"
+            />
+          </svg>
+          <span class="text-sm text-blue-700 font-medium">
+            Model: all-MiniLM-L6-v2
+          </span>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="bg-white rounded-2xl shadow-2xl p-6 mb-8 fade-in">
+        <div class="flex gap-3 mb-4">
+          <div class="flex-1 relative">
+            <svg
+              class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Cari aplikasi... (contoh: absensi, keuangan, tracking)"
+              class="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-lg"
+            />
+          </div>
+          <button
+            onclick="searchApps()"
+            id="searchButton"
+            class="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            Search
+          </button>
+        </div>
+
+        <!-- Quick Search Examples -->
+        <div class="border-t pt-4">
+          <p class="text-sm text-gray-500 mb-2">Contoh pencarian:</p>
+          <div class="flex gap-2 flex-wrap">
+            <button
+              onclick="quickSearch('absensi')"
+              class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition-colors"
+            >
+              absensi
+            </button>
+            <button
+              onclick="quickSearch('keuangan')"
+              class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition-colors"
+            >
+              keuangan
+            </button>
+            <button
+              onclick="quickSearch('tracking barang')"
+              class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition-colors"
+            >
+              tracking barang
+            </button>
+            <button
+              onclick="quickSearch('security')"
+              class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition-colors"
+            >
+              security
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="hidden text-center py-12">
+        <div class="loader mx-auto mb-4"></div>
+        <p class="text-gray-600">Mencari dengan AI semantic search...</p>
+      </div>
+
+      <!-- Search Results -->
+      <div id="searchResults" class="hidden">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-bold text-gray-800">
+            <span id="resultsTitle">Hasil Pencarian</span>
+          </h2>
+          <div class="text-sm text-gray-600">
+            <span id="resultsCount"></span>
+          </div>
+        </div>
+        <div
+          id="resultsGrid"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          <!-- Results will be inserted here -->
+        </div>
+      </div>
+
+      <!-- All Apps Display -->
+      <div id="allApps">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-800">
+            📱 Semua Aplikasi Internal
+          </h2>
+          <div class="text-sm text-gray-600">
+            <span id="totalApps"></span>
+          </div>
+        </div>
+        <div
+          id="appsGrid"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          <!-- Apps will be loaded here -->
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        id="emptyState"
+        class="hidden text-center py-12 bg-white rounded-xl shadow-lg"
+      >
+        <svg
+          class="w-16 h-16 mx-auto text-gray-400 mb-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <p class="text-gray-600 text-lg mb-2">
+          Tidak ada hasil untuk "<span id="emptyQuery"></span>"
+        </p>
+        <p class="text-gray-500 text-sm">
+          Coba kata kunci lain atau kategori berbeda
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = "http://localhost:5001/api";
+
+      const categoryIcons = {
+        "Human Resource": "👥",
+        Finance: "💰",
+        Operations: "⚙️",
+        Logistics: "📦",
+        Sales: "🤝",
+        Security: "🔒",
+        "IT Support": "🛠️",
+        "Project Management": "📊",
+        Inventory: "📋",
+        "Document Management": "📁",
+      };
+
+      // Load all apps on page load
+      window.onload = () => {
+        loadAllApps();
+
+        // Enable search on Enter key
+        document
+          .getElementById("searchInput")
+          .addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              searchApps();
+            }
+          });
+      };
+
+      async function loadAllApps() {
+        try {
+          const response = await fetch(`${API_URL}/apps`);
+          const data = await response.json();
+
+          document.getElementById(
+            "totalApps"
+          ).textContent = `${data.total} aplikasi`;
+
+          const grid = document.getElementById("appsGrid");
+          grid.innerHTML = data.apps.map((app) => createAppCard(app)).join("");
+        } catch (error) {
+          console.error("Error loading apps:", error);
+          document.getElementById("appsGrid").innerHTML = `
+                    <div class="col-span-full text-center py-8 text-red-600">
+                        ❌ Gagal memuat aplikasi. Pastikan backend berjalan di http://localhost:5001.
+                    </div>
+                `;
+        }
+      }
+
+      async function searchApps() {
+        const query = document.getElementById("searchInput").value.trim();
+
+        if (!query) {
+          // Show all apps if query is empty
+          document.getElementById("allApps").classList.remove("hidden");
+          document.getElementById("searchResults").classList.add("hidden");
+          document.getElementById("emptyState").classList.add("hidden");
+          return;
+        }
+
+        // Show loading
+        document.getElementById("loadingState").classList.remove("hidden");
+        document.getElementById("allApps").classList.add("hidden");
+        document.getElementById("searchResults").classList.add("hidden");
+        document.getElementById("emptyState").classList.add("hidden");
+
+        try {
+          const response = await fetch(`${API_URL}/search`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ query, top_k: 5 }),
+          });
+
+          const data = await response.json();
+
+          // Hide loading
+          document.getElementById("loadingState").classList.add("hidden");
+
+          if (data.results && data.results.length > 0) {
+            // Show results
+            document.getElementById("searchResults").classList.remove("hidden");
+            document.getElementById(
+              "resultsTitle"
+            ).textContent = `Hasil untuk "${query}"`;
+            document.getElementById(
+              "resultsCount"
+            ).textContent = `${data.total} hasil ditemukan`;
+
+            const grid = document.getElementById("resultsGrid");
+            grid.innerHTML = data.results
+              .map((result, idx) => createSearchResultCard(result, idx + 1))
+              .join("");
+          } else {
+            // Show empty state
+            document.getElementById("emptyState").classList.remove("hidden");
+            document.getElementById("emptyQuery").textContent = query;
+          }
+        } catch (error) {
+          console.error("Search error:", error);
+          document.getElementById("loadingState").classList.add("hidden");
+          alert("Error melakukan pencarian. Pastikan backend berjalan.");
+        }
+      }
+
+      function quickSearch(query) {
+        document.getElementById("searchInput").value = query;
+        searchApps();
+      }
+
+      function createAppCard(app) {
+        const icon = categoryIcons[app.category] || "📱";
+        return `
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 fade-in transform hover:-translate-y-1">
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="text-4xl">${icon}</div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-800 mb-1">${
+                              app.name
+                            }</h3>
+                            <span class="text-sm text-gray-500">${
+                              app.category
+                            }</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">${
+                      app.description
+                    }</p>
+                    
+                    ${
+                      app.aliases && app.aliases.length > 0
+                        ? `
+                        <div class="mb-3">
+                            <p class="text-xs text-gray-500 mb-1">Aliases:</p>
+                            <div class="flex flex-wrap gap-1">
+                                ${app.aliases
+                                  .map(
+                                    (alias) => `
+                                    <span class="px-2 py-0.5 bg-purple-50 text-purple-700 rounded text-xs">${alias}</span>
+                                `
+                                  )
+                                  .join("")}
+                            </div>
+                        </div>
+                    `
+                        : ""
+                    }
+                    
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-500 mb-2">Fitur:</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${app.features
+                              .map(
+                                (feature) => `
+                                <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">${feature}</span>
+                            `
+                              )
+                              .join("")}
+                        </div>
+                    </div>
+                </div>
+            `;
+      }
+
+      function createSearchResultCard(result, rank) {
+        const app = result.app;
+        const icon = categoryIcons[app.category] || "📱";
+
+        return `
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 fade-in">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="text-4xl">${icon}</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-800">${
+                                  app.name
+                                }</h3>
+                                <span class="text-sm text-gray-500">${
+                                  app.category
+                                }</span>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                            <div class="flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full">
+                                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <span class="text-sm font-semibold text-blue-600">${(
+                                  result.final_score * 100
+                                ).toFixed(0)}%</span>
+                            </div>
+                            <span class="text-xs text-gray-400">#${rank}</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-600 text-sm mb-4 leading-relaxed">${
+                      app.description
+                    }</p>
+                    
+                    ${
+                      app.features
+                        ? `
+                        <div class="mb-4">
+                            <p class="text-xs text-gray-500 mb-2">Fitur:</p>
+                            <div class="flex flex-wrap gap-2">
+                                ${app.features
+                                  .map(
+                                    (feature) => `
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">${feature}</span>
+                                `
+                                  )
+                                  .join("")}
+                            </div>
+                        </div>
+                    `
+                        : ""
+                    }
+                    
+                    <!-- Score Breakdown -->
+                    <div class="border-t pt-3 space-y-2">
+                        <div>
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Semantic Score (50%)</span>
+                                <span class="font-semibold">${(
+                                  result.semantic_score * 100
+                                ).toFixed(1)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div class="bg-blue-600 h-1.5 rounded-full transition-all" style="width: ${
+                                  result.semantic_score * 100
+                                }%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Keyword Score (30%)</span>
+                                <span class="font-semibold">${(
+                                  result.keyword_score * 100
+                                ).toFixed(1)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div class="bg-green-600 h-1.5 rounded-full transition-all" style="width: ${
+                                  result.keyword_score * 100
+                                }%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Category Boost (20%)</span>
+                                <span class="font-semibold">${(
+                                  result.category_boost * 100
+                                ).toFixed(1)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div class="bg-purple-600 h-1.5 rounded-full transition-all" style="width: ${
+                                  result.category_boost * 100
+                                }%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+      }
+    </script>
+  </body>
+</html>
