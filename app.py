@@ -8,12 +8,10 @@ import os
 app = Flask(__name__, static_folder='.')
 CORS(app)
 
-# Your existing configuration
 DB_PATH = "./data/apps.json"
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K = 5
 
-# Load model and data
 print("🔄 Loading model...")
 model = SentenceTransformer(MODEL_NAME)
 
@@ -23,7 +21,6 @@ with open(DB_PATH, "r", encoding="utf-8") as f:
 
 apps = db["apps"]
 
-# Prepare embeddings
 app_embeddings = []
 valid_apps = []
 
@@ -40,7 +37,6 @@ app_embeddings = app_embeddings / np.linalg.norm(
 print(f"✅ Loaded {len(valid_apps)} apps")
 
 
-# Your exact functions from search_app.py
 def keyword_score(query: str, app_data: dict) -> float:
     query = query.lower()
     text = " ".join([
@@ -94,7 +90,6 @@ def search_apps(query: str, top_k: int = TOP_K):
     return results[:top_k]
 
 
-# API Routes
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
