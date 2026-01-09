@@ -1,6 +1,6 @@
-# 🔍 SEO with AI — App Version (Semantic Search Engine)
+# 🔍 SEO with AI (app version)
 
-**AI-powered semantic search engine** berbasis **Flask + Sentence Transformers**.
+**AI-powered semantic search engine** berbasis **Flask + Sentence Transformers** untuk meningkatkan relevansi pencarian aplikasi berbasis semantic search + keyword hybrid scoring.
 
 ---
 
